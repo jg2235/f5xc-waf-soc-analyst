@@ -1,0 +1,15 @@
+{
+  "name": "f5xc-waf",
+  "owner": {
+    "name": "Jeff Granieri",
+    "email": "jgranieri22@outlook.com"
+  },
+  "plugins": [
+    {
+      "name": "f5xc-waf-skills",
+      "source": "./",
+      "description": "F5 Distributed Cloud WAF + AI-powered WAF analyst skills (events, tuning, API security, bot defense, investigations, solutions)."
+    }
+  ],
+  "description": "F5 Distributed Cloud WAF analyst skills: security-event hunting, WAF/LB config audit, FP tuning, API security, bot defense, and autonomous investigation. Read-only against the tenant."
+}

@@ -1,0 +1,54 @@
+name: API field / naming correction
+description: A documented field name, filter key, or endpoint is wrong
+labels: ["bug", "documentation", "api-accuracy"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This project's most damaging defects have been **wrong field names that
+        fail silently** — a bad filter key returns zero hits rather than an error,
+        which reads as a clean finding. Corrections here are high value.
+  - type: input
+    id: name
+    attributes:
+      label: The name as currently documented
+      placeholder: "signature_id"
+    validations: {required: true}
+  - type: input
+    id: correct
+    attributes:
+      label: The correct name
+      placeholder: "signatures.id"
+    validations: {required: true}
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Where it is used
+      options:
+        - Event query filter key
+        - Event aggregation field (UPPER_SNAKE)
+        - Access-log aggregation field
+        - Event record field
+        - Config object field
+        - API endpoint path
+    validations: {required: true}
+  - type: dropdown
+    id: failure
+    attributes:
+      label: How the wrong name fails
+      options:
+        - "Silently — returns 0 results or null (high severity)"
+        - "Loudly — HTTP 400 or an exception"
+    validations: {required: true}
+  - type: textarea
+    id: proof
+    attributes:
+      label: Proof against a live tenant
+      description: The query, the response, and the XC release if known. Redact identifiers.
+      render: shell
+    validations: {required: true}
+  - type: input
+    id: file
+    attributes:
+      label: File and line to correct
+      placeholder: "skills/xc-security-events/SKILL.md:77"

@@ -1,0 +1,39 @@
+name: Feature request
+description: Propose a new capability or skill
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The analyst problem
+      description: What question can you not currently answer, or what workflow is manual?
+    validations: {required: true}
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+    validations: {required: true}
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Which skill should own it
+      options:
+        - xc-security-events
+        - xc-waf-config
+        - xc-api-security
+        - xc-bot-defense
+        - xc-waf-tuning
+        - xc-waf-investigator
+        - xc-waf-solutions
+        - a new skill
+    validations: {required: true}
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Design constraints
+      description: These are non-negotiable in this project.
+      options:
+        - label: This does not require the skill to write to the tenant (changes are emitted as reviewable scripts)
+          required: true
+        - label: This does not add unauthorised scanning, attack execution, or detection evasion
+          required: true

@@ -1,0 +1,16 @@
+{
+  "metadata": {"name": "{{PREFIX}}-lb", "namespace": "{{NAMESPACE}}"},
+  "spec": {
+    "domains": ["{{DOMAIN}}"],
+    "https_auto_cert": {"http_redirect": true, "add_hsts": true, "no_mtls": {}},
+    "default_route_pools": [{"pool": {"namespace": "{{NAMESPACE}}", "name": "{{PREFIX}}-pool"}, "weight": 1, "priority": 1}],
+    "app_firewall": {"namespace": "{{NAMESPACE}}", "name": "{{PREFIX}}-fw"},
+    "advertise_on_public_default_vip": {},
+    "enable_api_discovery": {"discovered_api_settings": {"purge_duration_for_inactive_discovered_apis": 30}},
+    "enable_malicious_user_detection": {},
+    "no_challenge": {},
+    "disable_rate_limit": {},
+    "user_id_client_ip": {},
+    "source_ip_stickiness": {}
+  }
+}

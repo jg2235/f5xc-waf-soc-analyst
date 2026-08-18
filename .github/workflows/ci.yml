@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate skills and docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install --quiet -r requirements.txt
+
+      # No live tenant in CI: these are offline checks against the repo only.
+      # Field names are verified against a live tenant at authoring time and
+      # frozen here as regressions -- see CONTRIBUTING.md.
+      - name: Documentation regression suite
+        run: python3 tests/test_docs.py
+
+      - name: Manifests parse
+        run: |
+          python3 -c "import json;json.load(open('.claude-plugin/plugin.json'))"
+          python3 -c "import json;json.load(open('.claude-plugin/marketplace.json'))"
+
+      - name: Build bundles
+        run: bash scripts/build.sh
+
+      - name: Confirm bundle for declared version exists
+        run: |
+          V=$(python3 -c "import json;print(json.load(open('.claude-plugin/plugin.json'))['version'])")
+          test -f "dist/f5xc-waf-skills-v${V}.plugin" || { echo "missing dist bundle for v${V}"; exit 1; }
+          echo "built v${V}"
+
+      - name: Upload bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-bundles
+          path: dist/
+          retention-days: 14
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reject committed engagement output
+        run: |
+          # reports/ and changes/ carry tenant ids, customer hostnames and
+          # operator source IPs. They must never enter history.
+          if git ls-files --error-unmatch 'reports/*.html' 'reports/*.docx' \
+               'changes/*.py' >/dev/null 2>&1; then
+            echo "::error::engagement output committed -- see SECURITY.md"
+            exit 1
+          fi
+          echo "clean: no engagement output tracked"
+
+      - name: Reject literal API tokens
+        run: |
+          if grep -rInE "APIToken[[:space:]]+[A-Za-z0-9+/=]{20,}" \
+               --exclude-dir=.git . ; then
+            echo "::error::possible committed F5XC API token"
+            exit 1
+          fi
+          echo "clean: no token material found"

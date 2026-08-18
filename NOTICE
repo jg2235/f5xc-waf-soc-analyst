@@ -1,0 +1,20 @@
+F5 XC WAF Skills
+Copyright 2026 Jeff Granieri
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+
+---
+
+This project targets the F5 Distributed Cloud (XC) public API. "F5",
+"F5 Distributed Cloud", "Volterra", and related marks are trademarks of F5, Inc.
+This project is an independent work and is not affiliated with, endorsed by, or
+supported by F5, Inc.

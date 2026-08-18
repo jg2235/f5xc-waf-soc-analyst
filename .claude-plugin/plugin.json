@@ -1,0 +1,42 @@
+{
+  "name": "f5xc-waf-skills",
+  "version": "1.0.2",
+  "description": "F5 Distributed Cloud WAF + AI-powered WAF skills for Claude: security-event hunting and aggregation via the app_security events API; WAF/LB config auditing; false-positive reduction and exclusion-rule tuning; ML-driven API discovery and schema enforcement; bot defense and malicious-user analysis; autonomous WAF event investigation (xc-waf-investigator); and one-prompt WAF solutions: app onboarding behind WAF, FP-reduction tuning loops, API protection rollout, and bot/malicious-user hardening. Read-only against the tenant; all config changes are emitted as reviewed, dry-run-capable Python scripts.",
+  "author": {
+    "name": "Jeff Granieri",
+    "email": "jgranieri22@outlook.com"
+  },
+  "keywords": [
+    "f5",
+    "f5xc",
+    "distributed-cloud",
+    "volterra",
+    "waf",
+    "app-firewall",
+    "api-security",
+    "api-discovery",
+    "bot-defense",
+    "malicious-users",
+    "false-positive",
+    "exclusion-rules",
+    "service-policy",
+    "security-events",
+    "investigation",
+    "soc",
+    "ai-waf"
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/bootstrap_creds.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/jg2235/f5xc-waf-skills"
+}

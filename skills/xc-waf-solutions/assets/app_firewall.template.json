@@ -1,0 +1,11 @@
+{
+  "metadata": {"name": "{{PREFIX}}-fw", "namespace": "{{NAMESPACE}}"},
+  "spec": {
+    "monitoring": {},
+    "default_detection_settings": {},
+    "default_bot_setting": {},
+    "allow_all_response_codes": {},
+    "default_anonymization": {},
+    "use_default_blocking_page": {}
+  }
+}

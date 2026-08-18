@@ -1,0 +1,11 @@
+{
+  "metadata": {"name": "{{PREFIX}}-pool", "namespace": "{{NAMESPACE}}"},
+  "spec": {
+    "origin_servers": [{"public_name": {"dns_name": "{{ORIGIN_DNS}}"}}],
+    "port": {{ORIGIN_PORT}},
+    "no_tls": {},
+    "loadbalancer_algorithm": "LB_OVERRIDE",
+    "endpoint_selection": "LOCAL_PREFERRED",
+    "healthcheck": []
+  }
+}

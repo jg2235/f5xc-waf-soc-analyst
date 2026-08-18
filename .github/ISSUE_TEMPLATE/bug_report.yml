@@ -1,0 +1,61 @@
+name: Bug report
+description: Something in the skills or scripts behaves incorrectly
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not paste tenant data.** Redact source IPs, hostnames, support IDs,
+        tenant identifiers, and namespaces before submitting. Never paste a token.
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version
+      description: "Output of: claude plugin list"
+      placeholder: "1.0.2"
+    validations: {required: true}
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Which skill
+      options:
+        - xc-security-events
+        - xc-waf-config
+        - xc-api-security
+        - xc-bot-defense
+        - xc-waf-tuning
+        - xc-waf-investigator
+        - xc-waf-solutions
+        - shared client / scripts
+        - other
+    validations: {required: true}
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations: {required: true}
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: |
+        Include the query and the API response. A **zero-result** response is a
+        valid bug report here — several defects in this project returned 0 hits
+        instead of an error.
+      render: shell
+    validations: {required: true}
+  - type: textarea
+    id: smoke
+    attributes:
+      label: smoke_test.py output
+      description: "python3 skills/xc-security-events/scripts/smoke_test.py --ns <ns>"
+      render: shell
+  - type: checkboxes
+    id: hygiene
+    attributes:
+      label: Confirmations
+      options:
+        - label: I have redacted all tenant, customer, and personal data
+          required: true
+        - label: No credentials appear anywhere in this report
+          required: true

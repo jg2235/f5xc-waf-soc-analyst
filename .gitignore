@@ -1,0 +1,50 @@
+# ---- Engagement output: NEVER commit ----------------------------------------
+# These directories hold live-tenant analysis: tenant ids, namespaces, source IPs
+# (including operator//home addresses), support IDs and customer hostnames.
+# They are per-engagement artifacts, not source. Keep them local or move them to
+# a private evidence store.
+# NOTE: 'dir/*' not 'dir/' — git cannot re-include a file whose parent
+# directory is excluded, so the .gitkeep negations below only work this way.
+reports/*
+changes/*
+!reports/.gitkeep
+!changes/.gitkeep
+
+# ---- Credentials -------------------------------------------------------------
+.env
+.env.*
+*.token
+.f5xc/
+credentials.json
+*_token.txt
+*.pem
+*.key
+
+# ---- Build artifacts ---------------------------------------------------------
+# Bundles are attached to GitHub Releases, not tracked in-tree.
+dist/
+*.skill
+*.plugin
+*.tar.gz
+*.tgz
+*.zip
+
+# ---- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# ---- Editors / OS ------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ---- Local Claude state ------------------------------------------------------
+.claude/settings.local.json
