@@ -109,6 +109,17 @@ See `SECURITY.md`.
 | `SECURITY.md` | vulnerability reporting, credential and output handling |
 | `CHANGELOG.md` | version history |
 | `CODE_OF_CONDUCT.md` | participation expectations |
+ 
+## Screenshots
+<img width="1213" height="890" alt="image" src="https://github.com/user-attachments/assets/00b776ad-6ca4-4911-b93e-f2fbe16fb308" />
+
+<img width="757" height="691" alt="image" src="https://github.com/user-attachments/assets/7de78edc-98cf-4f98-95f9-7ff7c17535dc" />
+
+<img width="737" height="457" alt="image" src="https://github.com/user-attachments/assets/6dda896d-d0ef-4138-b6df-4dab266fbb02" />
+
+<img width="702" height="599" alt="image" src="https://github.com/user-attachments/assets/fcc916d4-933c-4fc8-bf85-0380e8ca2553" />
+
+
 
 ## License
 
