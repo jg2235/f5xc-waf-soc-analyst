@@ -1,7 +1,7 @@
 # F5 XC WAF Skills — AI Analyst for F5 Distributed Cloud WAAP
 
 A full-stack AI WAF analyst for F5 Distributed Cloud, built as a set of Claude skills and
-an operating persona (CLAUDE.md), modeled on the SentinelOne `s1-secops-skills`
+an operating persona (CLAUDE.md), 'secops-skills`
 architecture. Install once and Claude can hunt security events, triage attacks, run
 evidence-gated false-positive tuning, audit WAF posture, analyze ML-driven API discovery
 and bot/malicious-user intelligence, and roll out whole WAF solutions — entirely from
