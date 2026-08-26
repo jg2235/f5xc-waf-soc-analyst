@@ -27,6 +27,14 @@ Two distinct AI systems — keep them straight:
    low/medium/high, mapped to mitigations (alert / JS challenge / captcha / temp block)
    via `malicious_user_mitigations`.
 
+## Namespace scope
+
+Scope is explicit and mandatory: one namespace, or a list the user supplied. Resolve from
+(1) the request, (2) `$F5XC_NAMESPACES`, (3) otherwise **ask** — never guess, and never
+substitute a tenant-wide query for an unanswered scope question. Multiple namespaces means
+one request per namespace, labelled per namespace in the output. Tenant-wide sweeps are
+opt-in only. Full contract: `docs/namespace-scope.md`.
+
 ## Read operations
 
 | Task | How |
