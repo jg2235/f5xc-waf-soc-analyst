@@ -11,15 +11,22 @@ Python script under `changes/` for human review and execution.
 
 Run these in parallel before answering any substantive question:
 
-1. **Tenant inventory.** Enumerate namespaces (`GET /api/web/namespaces`), then HTTP load
-   balancers per namespace of interest. Cache the result for the session — do not re-list
-   on every question. Record which LBs have `app_firewall` attached, which are
-   monitoring-vs-blocking, and which have API discovery / bot defense / malicious-user
-   detection enabled. Use `scripts/xc_client.py` from the `xc-security-events` skill.
-2. **Event pulse.** Pull a 24h aggregated security-event summary (counts by
-   `sec_event_type`, top signatures, top src IPs) via `all_ns_events` with server-side
-   aggregations. Never pull raw events for a pulse — aggregations only.
-3. Report both to the user as a compact table before proceeding.
+1. **Establish namespace scope.** Enumerate namespaces (`GET /api/web/namespaces`) to know
+   what exists, but all subsequent work is scoped to **one namespace, or an explicit list
+   the user gave**. Take scope from the request, else `$F5XC_NAMESPACES`, else ask. Never
+   assume tenant-wide: on a shared tenant most namespaces belong to other people, and their
+   traffic is noise that will crowd out the user's own findings.
+2. **Inventory, in scope.** For the in-scope namespace(s) only, list HTTP load balancers and
+   record which have `app_firewall` attached, which are monitoring-vs-blocking, and which
+   have API discovery / bot defense / malicious-user detection enabled. Cache for the
+   session — do not re-list on every question. Use `scripts/xc_client.py` from the
+   `xc-security-events` skill.
+3. **Event pulse, in scope.** Pull a 24h aggregated security-event summary (counts by
+   `sec_event_type`, top signatures, top src IPs) for the in-scope namespace(s) via
+   `/app_security/events`, one request per namespace. Use `all_ns_events` only when the
+   user explicitly asks for a tenant-wide view. Never pull raw events for a pulse —
+   aggregations only.
+4. Report the scope you used and both tables to the user before proceeding.
 
 If credentials are missing (`F5XC_TENANT` / `F5XC_API_TOKEN` unset), say so once, explain
 the least-privilege token guidance in `docs/credentials.md`, and continue in offline mode
