@@ -1,7 +1,7 @@
 # Security Event Record Anatomy
 
 Each element of `events[]` (after `json.loads`) is a flat-ish JSON record (~66 top-level
-fields on current releases; validated against tenant f5-amer-ent, 2026-08-17). Fields
+fields on current releases; validated against a live enterprise tenant, 2026-08). Fields
 marked [V] below were confirmed in a live sample; enrichment fields vary by entitlement.
 Re-confirm per tenant with `smoke_test.py --dump-sample`.
 
@@ -58,14 +58,14 @@ parameter/header name when sampling FP evidence.
 | `country`, `city`, `region`, `latitude`, `longitude` | GeoIP |
 | `asn`, `as_org` | network owner |
 | `ip_reputation` / threat categories | present when IP intel matched |
-| `ja4_tls_fingerprint` [V, f5-amer-ent 2026-08] | client TLS fingerprint (JA4) — powerful cross-IP pivot |
+| `ja4_tls_fingerprint` [V, verified 2026-08] | client TLS fingerprint (JA4) — powerful cross-IP pivot |
 | `device_type`, `browser_type` | derived client info |
 
 ## Aggregation field names
 
 Aggs use UPPER_SNAKE keys, not the record field names. **The agg enum is narrower than
 the record schema — a field existing on the event record does NOT mean it can be
-aggregated.** Verified against tenant `f5-amer-ent` 2026-08-18:
+aggregated.** Verified against a live enterprise tenant, 2026-08:
 
 `ACTION`, `ASN`, `ATTACK_TYPE`, `BOT_CLASSIFICATION`, `BOT_NAME`, `BROWSER_TYPE`,
 `COUNTRY`, `DOMAIN`, `JA4_TLS_FINGERPRINT`, `METHOD`, `SEC_EVENT_NAME`, `SEC_EVENT_TYPE`,
