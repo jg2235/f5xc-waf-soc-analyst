@@ -3,8 +3,19 @@
 xc_client.py -- shared F5 Distributed Cloud API client for f5xc-waf-skills.
 
 Security posture:
-  * Credentials from env vars only (F5XC_TENANT, F5XC_API_TOKEN). Never accepts a
-    token as an argument; never logs headers or token material.
+  * Never accepts a token as an argument; never logs headers or token material.
+  * Token resolution, in order of preference:
+      1. $F5XC_TOKEN_CMD -- a shell command that prints the token on stdout. This is
+         the recommended enterprise path: the secret lives in a vault / secret
+         manager / OS keyring and never lands in a file or in shell history. e.g.
+             export F5XC_TOKEN_CMD='vault read -field=token secret/f5xc/readonly'
+             export F5XC_TOKEN_CMD='op read op://infra/f5xc/api-token'
+             export F5XC_TOKEN_CMD='aws secretsmanager get-secret-value --secret-id f5xc --query SecretString --output text'
+             export F5XC_TOKEN_CMD='secret-tool lookup service f5xc'
+      2. $F5XC_API_TOKEN -- direct env var. Acceptable for CI with a masked
+         secret; discouraged on shared or long-lived workstations.
+    A token is never read from a path this client is told about, and the resolved
+    value is held in memory only.
   * Read-only by default: POST is permitted only to known read/query endpoints
     unless the caller passes allow_write=True (used only by generated change
     scripts after human review, with --apply).
@@ -19,6 +30,8 @@ from __future__ import annotations
 import json
 import os
 import random
+import shlex
+import subprocess
 import sys
 import time
 from typing import Any, Dict, Iterator, List, Optional
@@ -36,12 +49,45 @@ BACKOFF_CAP = 32.0
 TIMEOUT = (10, 120)  # connect, read
 
 
+def _resolve_token() -> str:
+    """Resolve the API token without ever touching a plaintext file we manage."""
+    cmd = os.environ.get("F5XC_TOKEN_CMD")
+    if cmd:
+        try:
+            out = subprocess.run(shlex.split(cmd), capture_output=True, text=True,
+                                 timeout=30, check=True)
+        except FileNotFoundError:
+            sys.exit("ERROR: F5XC_TOKEN_CMD executable not found. Check the command.")
+        except subprocess.TimeoutExpired:
+            sys.exit("ERROR: F5XC_TOKEN_CMD timed out after 30s.")
+        except subprocess.CalledProcessError as e:
+            # stderr may carry vault/1password diagnostics but never the secret itself.
+            sys.exit(f"ERROR: F5XC_TOKEN_CMD failed (exit {e.returncode}): "
+                     f"{(e.stderr or '').strip()[:200]}")
+        token = out.stdout.strip()
+        if not token:
+            sys.exit("ERROR: F5XC_TOKEN_CMD produced no output.")
+        return token
+
+    token = os.environ.get("F5XC_API_TOKEN", "").strip()
+    if not token:
+        sys.exit(
+            "ERROR: no API token. Set F5XC_TOKEN_CMD to a command that prints the "
+            "token (preferred -- keeps the secret in your vault/keyring), or set "
+            "F5XC_API_TOKEN directly. See docs/credentials.md."
+        )
+    return token
+
+
 class XCClient:
     def __init__(self, tenant: Optional[str] = None, allow_write: bool = False):
         self.tenant = tenant or os.environ.get("F5XC_TENANT")
-        token = os.environ.get("F5XC_API_TOKEN")
-        if not self.tenant or not token:
-            sys.exit("ERROR: set F5XC_TENANT and F5XC_API_TOKEN environment variables.")
+        if not self.tenant and not os.environ.get("F5XC_API_URL"):
+            sys.exit(
+                "ERROR: set F5XC_TENANT (the label in your console URL, "
+                "https://<tenant>.console.ves.volterra.io) or F5XC_API_URL."
+            )
+        token = _resolve_token()
         # Tenant consoles resolve at console.ves.volterra.io; F5XC_API_URL overrides
         # entirely (e.g. staging or region-specific endpoints).
         self.base = os.environ.get(
