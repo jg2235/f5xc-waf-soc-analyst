@@ -23,6 +23,14 @@ config, or tuning mechanics. **All tenant writes remain generated change scripts
 "deployment" this skill performs is producing the ordered, reviewed script set + runbook,
 then (after the human applies each stage) running the validation queries.
 
+## Namespace scope
+
+Scope is explicit and mandatory: one namespace, or a list the user supplied. Resolve from
+(1) the request, (2) `$F5XC_NAMESPACES`, (3) otherwise **ask** — never guess, and never
+substitute a tenant-wide query for an unanswered scope question. Multiple namespaces means
+one request per namespace, labelled per namespace in the output. Tenant-wide sweeps are
+opt-in only. Full contract: `docs/namespace-scope.md`.
+
 ## Catalog
 
 | Solution | What it delivers | Playbook |
