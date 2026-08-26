@@ -20,6 +20,14 @@ Config primitive: read and audit the security config surface, and generate revie
 scripts. Builds on the `f5xc-api` skill for the object model, CRUD URL patterns, and the
 atomic read-modify-write pattern — load it for anything not covered here.
 
+## Namespace scope
+
+Scope is explicit and mandatory: one namespace, or a list the user supplied. Resolve from
+(1) the request, (2) `$F5XC_NAMESPACES`, (3) otherwise **ask** — never guess, and never
+substitute a tenant-wide query for an unanswered scope question. Multiple namespaces means
+one request per namespace, labelled per namespace in the output. Tenant-wide sweeps are
+opt-in only. Full contract: `docs/namespace-scope.md`.
+
 ## Read/audit operations (run freely)
 
 | Task | How |
