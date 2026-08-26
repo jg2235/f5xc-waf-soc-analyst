@@ -21,6 +21,14 @@ schemas (parameters, types), auth posture, sensitive-data detection, and risk sc
 skill reads that intelligence and drives the discovery → spec → validation → enforcement
 lifecycle.
 
+## Namespace scope
+
+Scope is explicit and mandatory: one namespace, or a list the user supplied. Resolve from
+(1) the request, (2) `$F5XC_NAMESPACES`, (3) otherwise **ask** — never guess, and never
+substitute a tenant-wide query for an unanswered scope question. Multiple namespaces means
+one request per namespace, labelled per namespace in the output. Tenant-wide sweeps are
+opt-in only. Full contract: `docs/namespace-scope.md`.
+
 ## Prerequisite
 
 `enable_api_discovery` must be set on the LB (with `discovered_api_settings` as desired).
