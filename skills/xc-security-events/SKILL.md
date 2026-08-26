@@ -26,9 +26,22 @@ Credentials: `F5XC_TENANT`, `F5XC_API_TOKEN` env vars — never inline tokens.
 
 ## Workflow
 
-1. **Scope first.** Namespace(s), LB(s), time window. Default window 24h; never default to
-   30d. If the user names an app, resolve LB name → virtual-host label
-   (`ves-io-http-loadbalancer-<lb-name>`) via the session inventory cache.
+1. **Scope first — namespace scope is mandatory and explicit.** Every query runs against
+   one namespace, or an explicit list the user supplied. There is no implicit default and
+   no implicit tenant-wide sweep. Resolve scope in this order:
+   1. namespace(s) named in the request;
+   2. `$F5XC_NAMESPACES` (comma-separated) as the user's standing scope;
+   3. otherwise **ask** which namespace(s) to use — do not guess, and do not substitute a
+      tenant-wide query for an unanswered scope question.
+
+   Tenant-wide (`--all-ns` / `all_ns_events`) is opt-in only, when the user explicitly asks
+   to look across the whole tenant. On a shared tenant it is mostly other tenants' users'
+   traffic, and it buries the namespaces the user actually owns. When you do run it, say so
+   and report which namespaces the hits came from.
+
+   Then fix the time window (default 24h; never default to 30d) and, if the user names an
+   app, resolve LB name → virtual-host label (`ves-io-http-loadbalancer-<lb-name>`) via the
+   session inventory cache.
 2. **Aggregate before you sample.** Answer count/top-N questions entirely with server-side
    `aggs`. Pull raw events only to show evidence (small `limit`, specific filter).
 3. **Run it.** Use `scripts/xc_events.py` (canonical runner) or generate an equivalent
@@ -110,11 +123,16 @@ and confirmed gotchas: `references/event-query-api.md`.
 - Long windows: parallel time slices (e.g. 7×24h) with a shared `Session`, merge locally.
 - Back off on 429: exponential + jitter, max 5 retries (built into `xc_client.py`).
 - Cache namespace/LB inventory once per session.
+- Multiple namespaces = one request per namespace, run in parallel and labelled per
+  namespace in the output. Do NOT collapse them into a tenant-wide sweep and filter
+  client-side: that reads every namespace to answer a question about a few.
 
 ## Scripts
 
 - `scripts/xc_client.py` — auth session, retry/backoff, GET/POST helpers. Import, don't copy.
-- `scripts/xc_events.py` — CLI: `--ns`, `--query`, `--agg FIELD:K`, `--hours`, `--sample N`,
-  `--all-ns`. Prints agg tables or JSONL samples.
+- `scripts/xc_events.py` — CLI: `--ns ns1[,ns2,...]` (or `$F5XC_NAMESPACES`), `--query`,
+  `--agg FIELD:K`, `--hours`, `--sample N`. Prints agg tables or JSONL samples, labelled
+  per namespace. Refuses to run with no scope; `--all-ns` additionally requires
+  `--confirm-all-ns`.
 - `scripts/smoke_test.py` — validates every endpoint this plugin uses against the live
   tenant; run once after install (see plugin README).
