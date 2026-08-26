@@ -20,6 +20,14 @@ Investigation orchestrator over the primitives (`xc-security-events`, `xc-waf-co
 `xc-bot-defense`, `xc-api-security`). Read-only; recommended mitigations are emitted as
 change scripts, never applied.
 
+## Namespace scope
+
+Scope is explicit and mandatory: one namespace, or a list the user supplied. Resolve from
+(1) the request, (2) `$F5XC_NAMESPACES`, (3) otherwise **ask** — never guess, and never
+substitute a tenant-wide query for an unanswered scope question. Multiple namespaces means
+one request per namespace, labelled per namespace in the output. Tenant-wide sweeps are
+opt-in only. Full contract: `docs/namespace-scope.md`.
+
 ## Evidence discipline & verdict gates (non-negotiable)
 
 Inherited from the plugin CLAUDE.md persona; essentials:
@@ -59,7 +67,7 @@ mode (default from ambiguity: SHORT).
 UA snapshot. Verdict per gates + one-paragraph rationale + next step.
 
 **MEDIUM — correlation sweep.** SHORT + pivots: same source across all LBs
-(`all_ns_events`); JA3/UA pivot to sibling IPs; malicious-user + bot verdicts for the
+(one request per in-scope namespace; `all_ns_events` only on explicit request — see `docs/namespace-scope.md`); JA3/UA pivot to sibling IPs; malicious-user + bot verdicts for the
 source; access-log slice (what did non-blocked requests do — the scary part); timeline
 histogram (date agg) for burst shape. Chain analysis: recon (scanner sigs, 404 spread) →
 exploitation (targeted sigs on real paths) → post-exploit indicators (unusual 200s,
