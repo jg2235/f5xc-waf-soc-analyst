@@ -1,0 +1,42 @@
+# Namespace scope — mandatory contract
+
+Every skill in this plugin operates on **one namespace, or an explicit list the user
+supplied**. There is no implicit default and no implicit tenant-wide sweep.
+
+## Why this is a hard rule
+
+Enterprise XC tenants are shared. A single tenant routinely carries hundreds of
+namespaces, one per engineer, team, or customer environment. A tenant-wide query
+therefore:
+
+- **buries the user's own data.** A namespace with a few thousand events disappears
+  under another namespace generating millions.
+- **reads data the operator may not be entitled to.** Other namespaces belong to other
+  teams and customers. Least privilege applies to reads, not just writes.
+- **leaks cross-tenant detail into reports.** Source IPs, hostnames, and support IDs
+  from someone else's namespace do not belong in this engagement's output.
+
+## Resolution order
+
+1. Namespace(s) named in the request.
+2. `$F5XC_NAMESPACES` — comma-separated, the operator's standing scope.
+3. Otherwise **ask.** Do not guess, and never substitute a tenant-wide query for an
+   unanswered scope question.
+
+## Multiple namespaces
+
+Issue one request per namespace, in parallel, and label results per namespace. Do **not**
+collapse them into a tenant-wide sweep filtered client-side — that reads every namespace
+in the tenant to answer a question about a few.
+
+```bash
+export F5XC_NAMESPACES="prod,staging"          # standing scope
+./xc_events.py --ns prod,staging --agg SRC_IP:20
+./xc_events.py --ns prod --agg SIGNATURE_ID:50 # one-off override
+```
+
+## Tenant-wide
+
+`all_ns_events` / `--all-ns` is opt-in only, when the user explicitly asks to look across
+the whole tenant. The CLI additionally requires `--confirm-all-ns`. When you run it, say
+so, and report which namespaces the hits came from so the user can re-scope.
