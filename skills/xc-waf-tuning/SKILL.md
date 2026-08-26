@@ -17,6 +17,14 @@ description: >-
 The tuning loop, evidence-gated end to end. Never recommend an exclusion from counts
 alone; never widen scope beyond what the evidence supports.
 
+## Namespace scope
+
+Scope is explicit and mandatory: one namespace, or a list the user supplied. Resolve from
+(1) the request, (2) `$F5XC_NAMESPACES`, (3) otherwise **ask** — never guess, and never
+substitute a tenant-wide query for an unanswered scope question. Multiple namespaces means
+one request per namespace, labelled per namespace in the output. Tenant-wide sweeps are
+opt-in only. Full contract: `docs/namespace-scope.md`.
+
 ## The loop
 
 1. **Rank the noise.** 7d (default) aggregation: `SIGNATURE_ID` topk 50, per-LB. For
