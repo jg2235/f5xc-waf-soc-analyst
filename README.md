@@ -35,6 +35,69 @@ Primitive skills
 F5 XC REST API            /api/data (events, logs) · /api/ml/data (AI insights)
                           /api/config (read + human-applied change scripts)
 ```
+## Environment
+
+Set these before starting a session. Exports pass parent→child only, so put them in your
+shell profile — setting them in another terminal will not reach a running session.
+
+**Required**
+
+| Variable | Purpose |
+|---|---|
+| `F5XC_TENANT` | Tenant label from your console URL — `https://<tenant>.console.ves.volterra.io`. Bare label, no domain. |
+| one of `F5XC_TOKEN_CMD` / `F5XC_API_TOKEN` | The API token. Startup fails if neither is set. |
+
+**Recommended**
+
+| Variable | Purpose |
+|---|---|
+| `F5XC_NAMESPACES` | Standing namespace scope, comma-separated. Without it every query needs an explicit `--ns`, because the tooling refuses to guess (`docs/namespace-scope.md`). |
+
+**Optional**
+
+| Variable | Purpose |
+|---|---|
+| `F5XC_API_URL` | Full base-URL override for staging/regional endpoints. Replaces the tenant-derived URL — set this *or* `F5XC_TENANT`. |
+| `F5XC_NAMESPACE` | Singular. Read only by `change_script_template.py` as a generated script's target namespace; unused by queries. |
+
+```bash
+# --- identity -------------------------------------------------------------
+export F5XC_TENANT="your-tenant"
+
+# --- token: pick ONE ------------------------------------------------------
+# preferred — the secret stays in your vault/keyring and never lands on disk
+export F5XC_TOKEN_CMD='secret-tool lookup service f5xc'               # Linux keyring
+# export F5XC_TOKEN_CMD='op read op://infra/f5xc/api-token'           # 1Password
+# export F5XC_TOKEN_CMD='vault read -field=token secret/f5xc/readonly'
+# export F5XC_TOKEN_CMD='aws secretsmanager get-secret-value --secret-id f5xc --query SecretString --output text'
+# export F5XC_TOKEN_CMD='security find-generic-password -w -s f5xc'   # macOS Keychain
+
+# fallback — CI with a masked secret, or a short-lived session
+# read -rs F5XC_API_TOKEN && export F5XC_API_TOKEN
+
+# --- scope ----------------------------------------------------------------
+export F5XC_NAMESPACES="prod,staging"
+```
+
+Verify before working:
+
+```bash
+python3 -c "
+import sys;sys.path.insert(0,'skills/xc-security-events/scripts')
+from xc_client import XCClient
+print('OK —', len(XCClient().get('/api/web/namespaces')['items']), 'namespaces visible')"
+```
+
+Two failure modes that look alike but are not:
+
+- **`302` → `/login/start`** with a `not-found ... cname` body — `F5XC_TENANT` is wrong;
+  the hostname does not resolve to a tenant, and your token was never evaluated.
+- **`401 credential invalid`** — the tenant resolved and the credential was rejected.
+  Check expiry (90d max), and that you created an *API Token*, not an API Certificate.
+
+Never put the token in a file the tooling reads. If it has been in a plaintext file,
+treat it as disclosed and rotate it. Full guidance: `docs/credentials.md`.
+
 
 ## Install
 
